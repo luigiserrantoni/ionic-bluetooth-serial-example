@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Events } from '@ionic/angular';
+// import { Events } from '@ionic/angular';  //removed in ionic 5
 import { Storage } from '@ionic/storage';
 
 @Injectable()
@@ -10,7 +10,7 @@ export class StorageService {
   LANG = 'lang';
 
   constructor(
-    public events: Events,
+ //   public events: Events,	 //removed in ionic 5
     public storage: Storage
   ) {}
   /**

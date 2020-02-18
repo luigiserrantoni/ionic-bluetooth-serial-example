@@ -3,6 +3,8 @@
 - Events disabled in storage.service.ts (removed from ionic 5)
 - Added Italian language
 
+To be done...
+http -> @angular/common/http
 
 To install cordova
 ```bash

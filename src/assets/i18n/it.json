@@ -3,6 +3,9 @@
   "BACK_BUTTON_TEXT": "Indietro",
   "SEND": "Invia",
   "DISCONNECT": "Disconnetti",
+  "CANCEL": "Annulla",
+  "ACCEPT": "OK",
+  "AVAILABLE_DEVICES": "Dispositivi disponibili",
   "BLUETOOTH": {
     "NAME": "Nome",
     "ID": "ID",

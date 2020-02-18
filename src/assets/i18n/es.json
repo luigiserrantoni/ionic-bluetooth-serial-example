@@ -3,6 +3,9 @@
   "BACK_BUTTON_TEXT": "Atras",
   "SEND": "Enviar",
   "DISCONNECT": "Desconectar",
+  "CANCEL": "Cancelar",
+  "ACCEPT": "OK",
+  "AVAILABLE_DEVICES": "Dispositivos disponibles",
   "BLUETOOTH": {
     "NAME": "Nombre",
     "ID": "ID",

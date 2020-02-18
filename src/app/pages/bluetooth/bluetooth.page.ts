@@ -18,6 +18,7 @@ export class BluetoothPage implements OnInit, OnDestroy {
   isConnected = false;
   message = '';
   messages = [];
+  Connectedid = '';       //id of connected device, empy if not conencted
 
   constructor(
     private toastCtrl: ToastController,

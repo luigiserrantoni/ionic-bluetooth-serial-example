@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ToastController, AlertController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 /**
- * Esta clase proporciona al usuario la interfaz para manipular algunas opciones.
+ * This class provides the user with the interface to manipulate some options.
  * @author <a href="mailto:jlozoya1995@gmail.com">Juan Lozoya</a>
  */
 @Component({
@@ -28,15 +28,17 @@ export class BluetoothPage implements OnInit, OnDestroy {
   ) {
   }
   /**
-   * Carga parte del contenido después de inicializar el componente.
+   * Load part of the content after initializing the component.
    */
   ngOnInit() {
     this.showSpinner = true;
     this.bluetooth.storedConnection().then((connected) => {
       this.isConnected = true;
+      this.Connectedid=this.bluetooth.Connectedid;
       this.showSpinner = false;
-      this.sendMessage('nada');
+      this.sendMessage('connected on storedConnection() on ngOnInit()');
     }, (fail) => {
+      this.Connectedid='';
       this.bluetooth.searchBluetooth().then((devices: Array<Object>) => {
         this.devices = devices;
         this.showSpinner = false;
@@ -47,7 +49,7 @@ export class BluetoothPage implements OnInit, OnDestroy {
     });
   }
   /**
-   * Cierra la conexión bluetooth.
+   * Close the bluetooth connection.
    */
   disconnect(): Promise<boolean> {
     return new Promise(result => {
@@ -58,13 +60,13 @@ export class BluetoothPage implements OnInit, OnDestroy {
     });
   }
   /**
-   * Al cerrar la aplicación se asegura de que se cierre la conexión bluetooth.
+   * When closing the application, it ensures that the bluetooth connection is closed.
    */
   ngOnDestroy() {
     this.disconnect();
   }
   /**
-   * Busca los dispositivos bluetooth dispositivos al arrastrar la pantalla hacia abajo.
+   * Search for bluetooth devices by dragging the screen down.
    * @param refresher
    */
   refreshBluetooth(refresher) {
@@ -80,8 +82,8 @@ export class BluetoothPage implements OnInit, OnDestroy {
     }
   }
   /**
-   * Verifica si ya se encuentra conectado a un dispositivo bluetooth o no.
-   * @param seleccion Son los datos del elemento seleccionado  de la lista
+   * Check if you are already connected to a bluetooth device or not.
+   * @param seleccion They are the data of the selected item from the list
    */
   checkConnection(seleccion) {
     this.bluetooth.checkConnection().then(async (isConnected) => {
@@ -99,11 +101,13 @@ export class BluetoothPage implements OnInit, OnDestroy {
             handler: () => {
               this.disconnect().then(() => {
                 this.bluetooth.deviceConnection(seleccion.id).then(success => {
-                  this.sendMessage('nada');
+                  this.sendMessage('Reconnection established by checkConnection()');
                   this.isConnected = true;
+                  this.Connectedid=this.bluetooth.Connectedid;
                   this.presentToast(this.translate.instant(success));
                 }, fail => {
                   this.isConnected = false;
+                  this.Connectedid='';
                   this.presentToast(this.translate.instant(fail));
                 });
               });
@@ -126,11 +130,13 @@ export class BluetoothPage implements OnInit, OnDestroy {
             text: this.translate.instant('ACCEPT'),
             handler: () => {
               this.bluetooth.deviceConnection(seleccion.id).then(success => {
-                this.sendMessage('nada');
+                this.sendMessage('Connection established by checkConnection()');
                 this.isConnected = true;
+                this.Connectedid=this.bluetooth.Connectedid;
                 this.presentToast(this.translate.instant(success));
               }, fail => {
                 this.isConnected = false;
+                this.Connectedid='';
                 this.presentToast(this.translate.instant(fail));
               });
             }
@@ -141,7 +147,7 @@ export class BluetoothPage implements OnInit, OnDestroy {
     });
   }
   /**
-   * Permite enviar mensajes de texto vía serial al conectarse por bluetooth.
+   * Send text messages via serial when connecting via bluetooth.
    */
   sendMessage(message: string) {
     this.bluetooth.dataInOut(`${message}\n`).subscribe(data => {
@@ -154,7 +160,7 @@ export class BluetoothPage implements OnInit, OnDestroy {
         } catch (error) {
           console.log(`[bluetooth-168]: ${JSON.stringify(error)}`);
         }
-        // this.presentToast(data);
+         this.presentToast(data);       //data output to toast era commentato
         this.message = '';
       } else {
         this.presentToast(this.translate.instant(data));
@@ -162,15 +168,15 @@ export class BluetoothPage implements OnInit, OnDestroy {
     });
   }
   /**
-   * Recupera la información básica del servidor para las graficas de lineas.
+   * Retrieve the basic server information for line graphs.
    * @param message
    */
   addLine(message) {
     this.messages.push(message);
   }
   /**
-   * Presenta un cuadro de mensaje.
-   * @param {string} text Mensaje a mostrar.
+   * Present a message box.
+   * @param {string} text Message to show.
    */
   async presentToast(text: string) {
     const toast = await this.toastCtrl.create({

@@ -1,16 +1,22 @@
 ## Attempt of update to run on Ionic 5
 - Updated modules (package.json)
-- Events disabled in storage.service.ts (removed from ionic 5)
+- Events disabled in storage.service.ts (removed from ionic 5, seems are not used)
 - Added Italian language
+- Translated comments in english
+- Removed @angular/http module (already use @angular/common/http)
+- Modified form submit action to sendMessage(message) in bluetooth.page.html
 
 To be done...
-http -> @angular/common/http
 
 To install cordova
 ```bash
 npm i -g cordova
 npm i -g cordova-res
 ionic cordova platform add android
+```
+To compile android apk
+```bash
+ionic cordova build android
 ```
 
 Original Readme:

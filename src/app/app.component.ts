@@ -24,7 +24,7 @@ export class AppComponent {
     this.initializeApp();
   }
   /**
-   * Cierra el splash screen para mostrar la aplicación.
+   * Close the splash screen to show the application.
    */
   initializeApp() {
     this.platform.ready().then(() => {
@@ -33,15 +33,15 @@ export class AppComponent {
     });
   }
   /**
-   * Establezca el idioma predeterminado para las cadenas de traducción y el idioma actual.
+   * Set the default language for the translation strings and the current language.
    */
   initTranslate() {
-    this.translate.setDefaultLang('es');
+    this.translate.setDefaultLang('en');
     this.storage.getLang().then(lang => {
       if (!lang && this.translate.getBrowserLang() !== undefined) {
         this.translate.use(this.translate.getBrowserLang());
       } else {
-        this.translate.use(lang || 'es'); // Establezca su idioma aquí
+        this.translate.use(lang || 'en'); // Set your language here
       }
       this.translate.get(['BACK_BUTTON_TEXT']).subscribe(values => {
         this.config.set('backButtonText', values.BACK_BUTTON_TEXT);

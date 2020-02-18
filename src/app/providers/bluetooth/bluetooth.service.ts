@@ -4,7 +4,7 @@ import { StorageService } from '../storage/storage.service';
 import { Observable, Subscription, from } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 /**
- * Esta clase maneja la conectividad bluetooth.
+ * This class handles bluetooth connectivity.
  *
  * @author <a href="mailto:jlozoya1995@gmail.com">Juan Lozoya</a>
  * @see [Bluetooth Serial](https://ionicframework.com/docs/native/bluetooth-serial/)
@@ -15,15 +15,16 @@ export class BluetoothService {
   private connection: Subscription;
   private connectionCommunication: Subscription;
   private reader: Observable<any>;
+  Connectedid = '';       //id of connected device, empy if not conencted
 
   constructor(
     private bluetoothSerial: BluetoothSerial,
     private storage: StorageService
   ) {  }
   /**
-   * Busca los dispositivos bluetooth disponibles, evalúa si es posible usar la funcionalidad
-   * bluetooth en el dispositivo.
-   * @return {Promise<Object>} Regresa una lista de los dispositivos que se localizaron.
+   * Search for available bluetooth devices, evaluate if it is possible to use the functionality
+   * bluetooth on the device.
+   * @return {Promise<Object>} Return a list of the devices that were located.
    */
   searchBluetooth(): Promise<Object> {
     return new Promise((resolve, reject) => {
@@ -45,7 +46,7 @@ export class BluetoothService {
     });
   }
   /**
-   * Verifica si ya se encuentra conectado a un dispositivo bluetooth o no.
+   * Check if you are already connected to a bluetooth device or not.
    */
   checkConnection() {
     return new Promise((resolve, reject) => {
@@ -57,23 +58,25 @@ export class BluetoothService {
     });
   }
   /**
-   * Se conceta a un dispostitivo bluetooth por su id.
-   * @param id Es la id del dispositivo al que se desea conectarse
-   * @return {Promise<any>} Regresa un mensaje para indicar si se conectó exitosamente o no.
+   * It connects to a bluetooth device by its id.
+   * @param id It is the id of the device you want to connect to
+   * @return {Promise<any>} Return a message to indicate if you successfully connected or not.
    */
   deviceConnection(id: string): Promise<string> {
     return new Promise((resolve, reject) => {
       this.connection = this.bluetoothSerial.connect(id).subscribe(() => {
         this.storage.setBluetoothId(id);
+        this.Connectedid=id;
         resolve('BLUETOOTH.CONNECTED');
       }, fail => {
         console.log(`[bluetooth.service-88] Error conexión: ${JSON.stringify(fail)}`);
+        this.Connectedid='';
         reject('BLUETOOTH.CANNOT_CONNECT');
       });
     });
   }
   /**
-   * Cierra el socket para la conexión con un dispositivo bluetooth.
+   * Close the socket for connection with a bluetooth device.
    * @return {Promise<boolean>}
    */
   disconnect(): Promise<boolean> {
@@ -88,12 +91,11 @@ export class BluetoothService {
     });
   }
   /**
-   * Establece el socket para las comunicaciones seriales después de conectarse con un dispositivo
-   * bluetooth.
-   * @param message Es el texto que se desea enviar.
-   * @returns {Observable<any>} Regresa el texto que llegue vía seria a través de la conexión
-   * bluetooth al dispositivo, en caso de no existir una conexión regresa un mensaje indicando que:
-   * _No estas conectado a ningún dispositivo bluetooth_.
+   * Set the socket for serial communications after connecting with a bluetooth device
+   * @param message It is the text you want to send.
+   * @returns {Observable<any>} Return the text that arrives via serious connection
+   * bluetooth to the device, if there is no connection, a message returns indicating that:
+   * _You are not connected to any bluetooth device_.
    */
   dataInOut(message: string): Observable<any> {
     return Observable.create(observer => {
@@ -113,9 +115,9 @@ export class BluetoothService {
     });
   }
   /**
-   * Es un método que se puede llamar desde otras partes del código para intentar conectar con la
-   * id del ultimo dispositivo bluetooth al que se allá conectado.
-   * @return {Promise<any>} Regresa un mensaje para indicar si se conectó exitosamente o no.
+   * It is a method that can be called from other parts of the code to try to connect with the
+   * id of the last bluetooth device to which it is connected.
+   * @return {Promise<any>} Return a message to indicate if you successfully connected or not.
    */
   storedConnection(): Promise<any> {
     return new Promise((resolve, reject) => {

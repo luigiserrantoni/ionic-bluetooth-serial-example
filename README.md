@@ -5,6 +5,7 @@
 - Translated comments in english
 - Removed @angular/http module (already use @angular/common/http)
 - Modified form submit action to sendMessage(message) in bluetooth.page.html
+- Layot change in bluetooth.page.html: separated the items in different sections
 
 To be done...
 

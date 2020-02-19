@@ -15,7 +15,8 @@ export class BluetoothService {
   private connection: Subscription;
   private connectionCommunication: Subscription;
   private reader: Observable<any>;
-  Connectedid = '';       //id of connected device, empy if not conencted
+  ConnectedId = '';       //id of connected device, empty if not conencted
+  ConnectedName = '';       //Name of connected device, empty if not conencted
 
   constructor(
     private bluetoothSerial: BluetoothSerial,
@@ -29,7 +30,7 @@ export class BluetoothService {
   searchBluetooth(): Promise<Object> {
     return new Promise((resolve, reject) => {
       this.bluetoothSerial.isEnabled().then(success => {
-        this.bluetoothSerial.discoverUnpaired().then(response => {
+        this.bluetoothSerial.discoverUnpaired().then(response => {      //da contrillare UNPAIRED
           if (response.length > 0) {
             resolve(response);
           } else {
@@ -53,6 +54,8 @@ export class BluetoothService {
       this.bluetoothSerial.isConnected().then(isConnected => {
         resolve('BLUETOOTH.CONNECTED');
       }, notConnected => {
+        this.ConnectedId='';
+        this.ConnectedName='';
         reject('BLUETOOTH.NOT_CONNECTED');
       });
     });
@@ -60,17 +63,21 @@ export class BluetoothService {
   /**
    * It connects to a bluetooth device by its id.
    * @param id It is the id of the device you want to connect to
+   * @param name Ii is the name of the device you want to connect to
    * @return {Promise<any>} Return a message to indicate if you successfully connected or not.
    */
-  deviceConnection(id: string): Promise<string> {
+  deviceConnection(id: string, name: string): Promise<string> {
     return new Promise((resolve, reject) => {
       this.connection = this.bluetoothSerial.connect(id).subscribe(() => {
         this.storage.setBluetoothId(id);
-        this.Connectedid=id;
+        this.storage.setBluetoothName(name);   
+        this.ConnectedId=id;
+        this.ConnectedName=name;
         resolve('BLUETOOTH.CONNECTED');
       }, fail => {
         console.log(`[bluetooth.service-88] Error conexión: ${JSON.stringify(fail)}`);
-        this.Connectedid='';
+        this.ConnectedId='';
+        this.ConnectedName='';
         reject('BLUETOOTH.CANNOT_CONNECT');
       });
     });
@@ -87,6 +94,8 @@ export class BluetoothService {
       if (this.connection) {
         this.connection.unsubscribe();
       }
+      this.ConnectedId='';
+      this.ConnectedName='';      
       result(true);
     });
   }
@@ -123,10 +132,12 @@ export class BluetoothService {
     return new Promise((resolve, reject) => {
       this.storage.getBluetoothId().then(bluetoothId => {
         console.log(`[bluetooth.service-129] ${bluetoothId}`);
-        this.deviceConnection(bluetoothId).then(success => {
-          resolve(success);
-        }, fail => {
-          reject(fail);
+        this.storage.getBluetoothName().then(bluetoothName => {
+          this.deviceConnection(bluetoothId, bluetoothName).then(success => {
+            resolve(success);
+            }, fail => {
+              reject(fail);
+            });
         });
       });
     });

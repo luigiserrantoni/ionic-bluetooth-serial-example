@@ -19,20 +19,14 @@
     refreshingText="{{ 'BLUETOOTH.SEARCHING' | translate }}">
     </ion-refresher-content>
   </ion-refresher>
-  <div [hidden]="showSpinner === false" text-center>
-    <ion-spinner></ion-spinner><br>
-    {{ "BLUETOOTH.SEARCHING" | translate }}
-  </div>
 
-  <h3>Status</h3>
-  <span [hidden]="!isConnected"><p>Connected to {{Connectedid}}</p></span>
-  <span [hidden]="isConnected"><p>Disonnected</p></span>
-  <ion-button expand="block" color="dark" (click)="disconnect()" [disabled]="!isConnected">
-    {{ "DISCONNECT" | translate }}
-  </ion-button>
-
+  <!-- Availabel devices -->
   <span [hidden]="isConnected">
     <h3>{{ "AVAILABLE_DEVICES" | translate }}</h3>
+    <div [hidden]="showSpinner === false" text-center>
+      <ion-spinner></ion-spinner><br>
+      {{ "BLUETOOTH.SEARCHING" | translate }}
+    </div>
     <div [hidden]="devices.length > 0 || showSpinner == true || isConnected" text-center>
       <p>{{ "BLUETOOTH.NOT_FOUND" | translate }}</p>
     </div>
@@ -41,12 +35,12 @@
         <ion-text>
           <h4>{{ "BLUETOOTH.NAME" | translate }}: {{device.name}}</h4>
           <p>{{ "BLUETOOTH.ID" | translate }}: {{device.id}}</p>
-<!--          <p>{{ "BLUETOOTH.ADDRESS" | translate }}
+  <!--          <p>{{ "BLUETOOTH.ADDRESS" | translate }}
             <span [hidden]="device.address == undefined">mac</span>
             <span [hidden]="device.uuid == undefined">uuid</span>
             {{device.address}} {{device.uuid}}
           </p>
-         <p>
+        <p>
             <span [hidden]="device.class == undefined">Class</span>
             <span [hidden]="device.rssi == undefined">Rssi</span>
             {{device.class}} {{device.rssi}}
@@ -54,16 +48,33 @@
         </ion-text>
       </ion-item>
     </ion-list>
+    <ion-button expand="block" color="dark" (click)="scanBluetooth()">
+      {{ "DEVICE_SCAN_BUTTON" | translate }}
+      </ion-button>
   </span>
-<form (ngSubmit)="sendMessage(message);">
+
+  <h3>Status</h3>
+  <span [hidden]="!isConnected"><p>Connected to {{ConnectedName}}</p></span>
+  <span [hidden]="isConnected"><p>Disonnected</p></span>
+  <span [hidden]="!isConnected">
+    <ion-button expand="block" color="dark" (click)="disconnect()" [disabled]="!isConnected">
+    {{ "DISCONNECT" | translate }}
+    </ion-button>
+  </span>
+  
+ 
+
+  <h3>Send messages</h3>
+  <form (ngSubmit)="sendMessage(message);">
     <ion-item>
+      <ion-label color="primary" floating>Message</ion-label>
       <ion-input type="text" [(ngModel)]="message" name="message"></ion-input>
     </ion-item>
     <ion-row>
       <ion-col>
-        <ion-button expand="block" color="dark" (click)="disconnect()" [disabled]="!isConnected">
+    <!--    <ion-button expand="block" color="dark" (click)="disconnect()" [disabled]="!isConnected">
           {{ "DISCONNECT" | translate }}
-        </ion-button>
+        </ion-button>   -->
       </ion-col>
       <ion-col>
         <ion-button expand="block" type="submit" [disabled]="!isConnected">
@@ -72,6 +83,8 @@
       </ion-col>
     </ion-row>
   </form>
+  
+  <h3>Messages list</h3>
   <p *ngFor="let item of messages">{{ item }}</p>
 
 </ion-content>

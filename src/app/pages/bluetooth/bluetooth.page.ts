@@ -18,7 +18,8 @@ export class BluetoothPage implements OnInit, OnDestroy {
   isConnected = false;
   message = '';
   messages = [];
-  Connectedid = '';       //id of connected device, empy if not conencted
+  ConnectedId = '';       //id of connected device, empty if not conencted
+  ConnectedName = '';       //Name of connected device, empty if not conencted
 
   constructor(
     private toastCtrl: ToastController,
@@ -35,11 +36,13 @@ export class BluetoothPage implements OnInit, OnDestroy {
     this.showSpinner = true;
     this.bluetooth.storedConnection().then((connected) => {
       this.isConnected = true;
-      this.Connectedid=this.bluetooth.Connectedid;
+      this.ConnectedId=this.bluetooth.ConnectedId;
+      this.ConnectedName=this.bluetooth.ConnectedName;
       this.showSpinner = false;
       this.sendMessage('connected on storedConnection() on ngOnInit()');
     }, (fail) => {
-      this.Connectedid='';
+      this.ConnectedId='';
+      this.ConnectedName='';
       this.bluetooth.searchBluetooth().then((devices: Array<Object>) => {
         this.devices = devices;
         this.showSpinner = false;
@@ -64,6 +67,7 @@ export class BluetoothPage implements OnInit, OnDestroy {
    * When closing the application, it ensures that the bluetooth connection is closed.
    */
   ngOnDestroy() {
+    this.isConnected = false;
     this.disconnect();
   }
   /**
@@ -77,10 +81,23 @@ export class BluetoothPage implements OnInit, OnDestroy {
         this.devices = successMessage;
         refresher.target.complete();
       }, fail => {
+        this.devices = [];    //delete previous list of devices
         this.presentToast(this.translate.instant(fail));
         refresher.target.complete();
       });
     }
+  }
+   /**
+   * Search for bluetooth devices by pushing a button that recall this function.
+   */
+  scanBluetooth() {
+      this.bluetooth.searchBluetooth().then((successMessage: Array<Object>) => {
+        this.devices = [];
+        this.devices = successMessage;
+      }, fail => {
+        this.devices = [];    //delete previous list of devices
+        this.presentToast(this.translate.instant(fail));
+      });
   }
   /**
    * Check if you are already connected to a bluetooth device or not.
@@ -101,14 +118,16 @@ export class BluetoothPage implements OnInit, OnDestroy {
             text: this.translate.instant('ACCEPT'),
             handler: () => {
               this.disconnect().then(() => {
-                this.bluetooth.deviceConnection(seleccion.id).then(success => {
+                this.bluetooth.deviceConnection(seleccion.id, seleccion.name).then(success => {
                   this.sendMessage('Reconnection established by checkConnection()');
                   this.isConnected = true;
-                  this.Connectedid=this.bluetooth.Connectedid;
+                  this.ConnectedId=this.bluetooth.ConnectedId;
+                  this.ConnectedName=this.bluetooth.ConnectedName;
                   this.presentToast(this.translate.instant(success));
                 }, fail => {
                   this.isConnected = false;
-                  this.Connectedid='';
+                  this.ConnectedId='';
+                  this.ConnectedName='';
                   this.presentToast(this.translate.instant(fail));
                 });
               });
@@ -130,14 +149,16 @@ export class BluetoothPage implements OnInit, OnDestroy {
           {
             text: this.translate.instant('ACCEPT'),
             handler: () => {
-              this.bluetooth.deviceConnection(seleccion.id).then(success => {
+              this.bluetooth.deviceConnection(seleccion.id, seleccion.name).then(success => {
                 this.sendMessage('Connection established by checkConnection()');
                 this.isConnected = true;
-                this.Connectedid=this.bluetooth.Connectedid;
+                this.ConnectedId=this.bluetooth.ConnectedId;
+                this.ConnectedName=this.bluetooth.ConnectedName;
                 this.presentToast(this.translate.instant(success));
               }, fail => {
                 this.isConnected = false;
-                this.Connectedid='';
+                this.ConnectedId='';
+                this.ConnectedName='';
                 this.presentToast(this.translate.instant(fail));
               });
             }

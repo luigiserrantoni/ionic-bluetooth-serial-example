@@ -7,6 +7,7 @@ import { Storage } from '@ionic/storage';
 export class StorageService {
 
   BLUETOOTH_ID = 'bluetoothId';
+  BLUETOOTH_NAME = 'bluetoothName';
   LANG = 'lang';
 
   constructor(
@@ -27,6 +28,20 @@ export class StorageService {
    */
   async setBluetoothId(bluetoothId: string): Promise<any> {
     return await this.storage.set(this.BLUETOOTH_ID, bluetoothId);
+  }
+    /**
+   * Returns the bluetooth device name.
+   * @return {Promise<string>} bluetoothName.
+   */
+   async getBluetoothName(): Promise<string> {
+     return await this.storage.get(this.BLUETOOTH_NAME);
+   }
+  /**
+   * Store the bluetooth device name.
+   * @param bluetoothName device name
+   */
+  async setBluetoothName(bluetoothName: string): Promise<any> {
+    return await this.storage.set(this.BLUETOOTH_NAME, bluetoothName);
   }
   /**
    * Almacena el idioma selecionado por el usuario.

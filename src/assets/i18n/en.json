@@ -6,6 +6,7 @@
   "CANCEL": "Cancel",
   "ACCEPT": "OK",
   "AVAILABLE_DEVICES": "Available devices",
+  "DEVICE_SCAN_BUTTON": "Scan for devices",
   "BLUETOOTH": {
     "NAME": "Name",
     "ID": "ID",

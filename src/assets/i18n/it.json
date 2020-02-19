@@ -6,6 +6,7 @@
   "CANCEL": "Annulla",
   "ACCEPT": "OK",
   "AVAILABLE_DEVICES": "Dispositivi disponibili",
+  "DEVICE_SCAN_BUTTON": "Cerca dispositivi",
   "BLUETOOTH": {
     "NAME": "Nome",
     "ID": "ID",
@@ -20,7 +21,7 @@
     "SEARCHING": "Ricerca dispositivi bluetooth",
     "ALERTS": {
       "CONNECT": {
-        "TITLE": "Collegare",
+        "TITLE": "Connetti",
         "MESSAGE": "Connettiti con questo dispositivo"
       },
       "RECONNECT": {

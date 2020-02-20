@@ -179,18 +179,18 @@ export class BluetoothPage implements OnInit, OnDestroy {
   sendMessage(message: string) {
     this.bluetooth.dataInOut(`${message}\n`).subscribe(data => {
       if (data !== 'BLUETOOTH.NOT_CONNECTED') {
-        try {
+        try {                                                   // block of code to be tested for errors while it is being executed
           if (data) {
-            const entry = JSON.parse(data);
+            const entry = JSON.parse(data);                     //Converts a JavaScript Object Notation (JSON) string into an object. data shall be a valid JSON string
             this.addLine(message);
           }
-        } catch (error) {
+        } catch (error) {                                       // block of code to be executed, if an error occurs in the try block
           console.log(`[bluetooth-168]: ${JSON.stringify(error)}`);
         }
-         this.presentToast(data);       //data output to toast era commentato
+        // this.presentToast(data);       //data output to toast era commentato
         this.message = '';
       } else {
-        this.presentToast(this.translate.instant(data));
+        this.presentToast(this.translate.instant(data));        //show in Toast the error BLUETOOTH.NOT_CONNECTED
       }
     });
   }

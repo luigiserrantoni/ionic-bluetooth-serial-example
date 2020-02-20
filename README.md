@@ -1,13 +1,16 @@
 ## Attempt of update to run on Ionic 5
 - Updated modules (package.json)
-- Events disabled in storage.service.ts (removed from ionic 5, seems are not used)
+- Events disabled in storage.service.ts (removed from ionic 5, seems is not used)
 - Added Italian language
 - Translated comments in english
 - Removed @angular/http module (already use @angular/common/http)
 - Modified form submit action to sendMessage(message) in bluetooth.page.html
-- Layot change in bluetooth.page.html: separated the items in different sections
+- Layot change in bluetooth.page.html: separated the items in different sections and included in cards
+- replaced the refresh method for device scan with a button
+
 
 To be done...
+send/receive functinality
 
 To install cordova
 ```bash

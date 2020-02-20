@@ -58,6 +58,8 @@ export class BluetoothPage implements OnInit, OnDestroy {
   disconnect(): Promise<boolean> {
     return new Promise(result => {
       this.isConnected = false;
+      this.ConnectedId='';
+      this.ConnectedName='';
       this.bluetooth.disconnect().then(response => {
         result(response);
       });
@@ -74,7 +76,7 @@ export class BluetoothPage implements OnInit, OnDestroy {
    * Search for bluetooth devices by dragging the screen down.
    * @param refresher
    */
-  refreshBluetooth(refresher) {
+  /**  refreshBluetooth(refresher) {
     if (refresher) {
       this.bluetooth.searchBluetooth().then((successMessage: Array<Object>) => {
         this.devices = [];
@@ -86,17 +88,20 @@ export class BluetoothPage implements OnInit, OnDestroy {
         refresher.target.complete();
       });
     }
-  }
+  }      */
    /**
    * Search for bluetooth devices by pushing a button that recall this function.
    */
   scanBluetooth() {
-      this.bluetooth.searchBluetooth().then((successMessage: Array<Object>) => {
+    this.showSpinner = true;
+    this.bluetooth.searchBluetooth().then((successMessage: Array<Object>) => {
         this.devices = [];
         this.devices = successMessage;
+        this.showSpinner = false;
       }, fail => {
         this.devices = [];    //delete previous list of devices
         this.presentToast(this.translate.instant(fail));
+        this.showSpinner = false;
       });
   }
   /**

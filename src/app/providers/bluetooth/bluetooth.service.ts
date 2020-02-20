@@ -108,7 +108,7 @@ export class BluetoothService {
    */
   dataInOut(message: string): Observable<any> {
     return Observable.create(observer => {
-      this.bluetoothSerial.isConnected().then((isConnected) => {
+      this.bluetoothSerial.isConnected().then((isConnected) => {                        //if connected execute callback (isConnected) => {...
         this.reader = from(this.bluetoothSerial.write(message)).pipe(mergeMap(() => {
             return this.bluetoothSerial.subscribeRawData();
           })).pipe(mergeMap(() => {
@@ -117,7 +117,7 @@ export class BluetoothService {
         this.reader.subscribe(data => {
           observer.next(data);
         });
-      }, notConected => {
+      }, notConected => {                                                               //if not execute callback notConected => { ....
         observer.next('BLUETOOTH.NOT_CONNECTED');
         observer.complete();
       });

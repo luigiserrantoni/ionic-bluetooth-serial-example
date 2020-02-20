@@ -20,6 +20,7 @@ export class BluetoothPage implements OnInit, OnDestroy {
   messages = [];
   ConnectedId = '';       //id of connected device, empty if not conencted
   ConnectedName = '';       //Name of connected device, empty if not conencted
+  RecievedMsg = '';       //Answere received from connected device 
 
   constructor(
     private toastCtrl: ToastController,
@@ -177,11 +178,12 @@ export class BluetoothPage implements OnInit, OnDestroy {
    * Send text messages via serial when connecting via bluetooth.
    */
   sendMessage(message: string) {
-    this.bluetooth.dataInOut(`${message}\n`).subscribe(data => {
+    this.bluetooth.dataInOut(`${message}\n`).subscribe(data => {  //.subscribe(next, error, complete): next="data => {"
       if (data !== 'BLUETOOTH.NOT_CONNECTED') {
         try {                                                   // block of code to be tested for errors while it is being executed
           if (data) {
-            const entry = JSON.parse(data);                     //Converts a JavaScript Object Notation (JSON) string into an object. data shall be a valid JSON string
+            // const entry = JSON.parse(data);                     //Converts a JavaScript Object Notation (JSON) string into an object. data shall be a valid JSON string
+            this.RecievedMsg = JSON.parse(data);                     //Converts a JavaScript Object Notation (JSON) string into an object. data shall be a valid JSON string
             this.addLine(message);
           }
         } catch (error) {                                       // block of code to be executed, if an error occurs in the try block

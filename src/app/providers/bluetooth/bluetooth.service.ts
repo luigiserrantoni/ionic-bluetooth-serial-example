@@ -68,14 +68,14 @@ export class BluetoothService {
    */
   deviceConnection(id: string, name: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      this.connection = this.bluetoothSerial.connect(id).subscribe(() => {
+      this.connection = this.bluetoothSerial.connect(id).subscribe(() => {      //"connection" is a subscription
         this.storage.setBluetoothId(id);
-        this.storage.setBluetoothName(name);   
+        this.storage.setBluetoothName(name);
         this.ConnectedId=id;
         this.ConnectedName=name;
         resolve('BLUETOOTH.CONNECTED');
-      }, fail => {
-        console.log(`[bluetooth.service-88] Error conexión: ${JSON.stringify(fail)}`);
+      }, fail => {                                                              //Error callback function, invoked when error occurs or the connection disconnects.
+        console.log(`[bluetooth.service-88] Connection error: ${JSON.stringify(fail)}`);
         this.ConnectedId='';
         this.ConnectedName='';
         reject('BLUETOOTH.CANNOT_CONNECT');
@@ -95,34 +95,74 @@ export class BluetoothService {
         this.connection.unsubscribe();
       }
       this.ConnectedId='';
-      this.ConnectedName='';      
+      this.ConnectedName='';
       result(true);
     });
   }
   /**
    * Set the socket for serial communications after connecting with a bluetooth device
    * @param message It is the text you want to send.
-   * @returns {Observable<any>} Return the text that arrives via serious connection
+   * @returns {Observable<any>} Return the text that arrives via serial connection
    * bluetooth to the device, if there is no connection, a message returns indicating that:
    * _You are not connected to any bluetooth device_.
    */
   dataInOut(message: string): Observable<any> {
     return Observable.create(observer => {
       this.bluetoothSerial.isConnected().then((isConnected) => {                        //if connected execute callback (isConnected) => {...
-        this.reader = from(this.bluetoothSerial.write(message)).pipe(mergeMap(() => {
-            return this.bluetoothSerial.subscribeRawData();
+        this.reader = from(this.bluetoothSerial.write(message)).pipe(mergeMap(() => {   //fill the "reader" observable with new created observer (from Creates an Observable from other type of data)
+            return this.bluetoothSerial.subscribeRawData();                             //bluetoothSerial.write returns nothing. pipe take nothing and pass the data to subscribeRawData that adds
           })).pipe(mergeMap(() => {
             return this.bluetoothSerial.readUntil('\n');   // <= delimitador
           }));
+
         this.reader.subscribe(data => {
-          observer.next(data);
+          observer.next(data);                                                          //send to subscriber(s) the data
         });
       }, notConected => {                                                               //if not execute callback notConected => { ....
-        observer.next('BLUETOOTH.NOT_CONNECTED');
+        observer.next('BLUETOOTH.NOT_CONNECTED');                                       //send to subscriber(s) the error string
         observer.complete();
       });
     });
   }
+
+
+
+    /**
+   * Send data to bluetooth device
+   * @param message It is the text you want to send.
+   * @returns {Observable<any>} Return 'SEND_OK'
+   * if there is no connection, a message returns indicating that:
+   * _You are not connected to any bluetooth device_.
+   */
+  dataSend(message: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+          this.bluetoothSerial.isConnected().then((isConnected) => {                        //if connected execute callback (isConnected) => {...
+            this.bluetoothSerial.write(message);
+            resolve('BLUETOOTH.CONNECTED');
+      }, fail => {                                                               //if not execute callback notConected => { ....
+        reject('BLUETOOTH.CANNOT_CONNECT');
+      });
+    });
+  }
+
+
+    /**
+  var dataBuffer = new Buffer("FF01DED100010401010104","hex");
+
+  this.bluetoothSerial.isConnected()
+  .then(data => {
+      this.bluetoothSerial.write(dataBuffer).then(data => {
+          this.output += "\r\nWrite : " + JSON.stringify(data);
+      },
+      error =>{
+          this.output += "\r\nWrite Error : " + JSON.stringify(error);
+      });
+  })
+  .catch(error => {
+    this.output += "\r\nBT disconnected";
+  });
+  */
+
   /**
    * It is a method that can be called from other parts of the code to try to connect with the
    * id of the last bluetooth device to which it is connected.

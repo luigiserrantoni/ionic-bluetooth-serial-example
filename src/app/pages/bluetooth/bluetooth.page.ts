@@ -16,11 +16,12 @@ export class BluetoothPage implements OnInit, OnDestroy {
   devices: any[] = [];
   showSpinner = false;
   isConnected = false;
+  datatosend = '';
   message = '';
   messages = [];
   ConnectedId = '';       //id of connected device, empty if not conencted
   ConnectedName = '';       //Name of connected device, empty if not conencted
-  RecievedMsg = '';       //Answere received from connected device 
+  RecievedMsg = '';       //Answere received from connected device
 
   constructor(
     private toastCtrl: ToastController,
@@ -107,6 +108,7 @@ export class BluetoothPage implements OnInit, OnDestroy {
   }
   /**
    * Check if you are already connected to a bluetooth device or not.
+   * Then creates proper alert (popup window) to allow connection/reconnection to the given device
    * @param seleccion They are the data of the selected item from the list
    */
   checkConnection(seleccion) {
@@ -178,7 +180,7 @@ export class BluetoothPage implements OnInit, OnDestroy {
    * Send text messages via serial when connecting via bluetooth.
    */
   sendMessage(message: string) {
-    this.bluetooth.dataInOut(`${message}\n`).subscribe(data => {  //.subscribe(next, error, complete): next="data => {"
+    this.bluetooth.dataInOut(`${message}\n`).subscribe(data => {  //.subscribe(next, error, complete). Subscrive only next: "data => {"
       if (data !== 'BLUETOOTH.NOT_CONNECTED') {
         try {                                                   // block of code to be tested for errors while it is being executed
           if (data) {
@@ -194,6 +196,19 @@ export class BluetoothPage implements OnInit, OnDestroy {
       } else {
         this.presentToast(this.translate.instant(data));        //show in Toast the error BLUETOOTH.NOT_CONNECTED
       }
+    });
+  }
+    /**
+   * Send text messages via serial when connecting via bluetooth.
+   */
+  sendData(datatosend: string) {
+    this.bluetooth.dataSend(`${datatosend}\n`).then(success => {
+      this.presentToast('sent '+ datatosend);
+    }, fail => {
+      this.isConnected = false;
+      this.ConnectedId='';
+      this.ConnectedName='';
+      this.presentToast(this.translate.instant(fail));
     });
   }
   /**

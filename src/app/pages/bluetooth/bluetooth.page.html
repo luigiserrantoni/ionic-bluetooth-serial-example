@@ -97,5 +97,20 @@
       <p>{{RecievedMsg}}</p>
     </ion-card-content>
   </ion-card>
-  
+
+  <ion-card>
+    <ion-card-header><ion-card-title>{{ "SEND_MSG_TITLE" | translate }}</ion-card-title></ion-card-header>
+    <ion-card-content>
+      <form (ngSubmit)="sendData(datatosend);">
+        <ion-item>
+          <ion-label color="primary" floating>Message</ion-label>
+          <ion-input type="text" [(ngModel)]="datatosend" name="datatosend"></ion-input>
+        </ion-item>
+          <ion-button expand="block" type="submit" [disabled]="!isConnected">
+            <ion-icon name="paper-plane" slot="start"></ion-icon>{{ "SEND" | translate }}
+          </ion-button>
+      </form>
+    </ion-card-content>
+  </ion-card>
+
 </ion-content>

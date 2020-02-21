@@ -2,6 +2,7 @@ import { BluetoothService, StorageService } from './../../providers/providers';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ToastController, AlertController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
+import { Observable, Subscription, from } from 'rxjs';
 /**
  * This class provides the user with the interface to manipulate some options.
  * @author <a href="mailto:jlozoya1995@gmail.com">Juan Lozoya</a>
@@ -18,10 +19,13 @@ export class BluetoothPage implements OnInit, OnDestroy {
   isConnected = false;
   datatosend = '';
   message = '';
-  messages = [];
+  sentmessages = [];
+  receivedmessages = [];
+  debugmessages = [];
   ConnectedId = '';       //id of connected device, empty if not conencted
   ConnectedName = '';       //Name of connected device, empty if not conencted
   RecievedMsg = '';       //Answere received from connected device
+  private RxSubscription: Subscription;
 
   constructor(
     private toastCtrl: ToastController,
@@ -35,14 +39,15 @@ export class BluetoothPage implements OnInit, OnDestroy {
    * Load part of the content after initializing the component.
    */
   ngOnInit() {
-    this.showSpinner = true;
+    this.showSpinner = true;                                                      //variable that activate the spinner
     this.bluetooth.storedConnection().then((connected) => {
       this.isConnected = true;
       this.ConnectedId=this.bluetooth.ConnectedId;
       this.ConnectedName=this.bluetooth.ConnectedName;
       this.showSpinner = false;
-      this.sendMessage('connected on storedConnection() on ngOnInit()');
-    }, (fail) => {
+      this.addDebugLine('connected on ngOnInit to the stored device');
+      this.startReceiveData();
+    }, (fail) => {                                                                //if stored connection fail, scan devices
       this.ConnectedId='';
       this.ConnectedName='';
       this.bluetooth.searchBluetooth().then((devices: Array<Object>) => {
@@ -62,6 +67,7 @@ export class BluetoothPage implements OnInit, OnDestroy {
       this.isConnected = false;
       this.ConnectedId='';
       this.ConnectedName='';
+      //this.stopReceiveData();
       this.bluetooth.disconnect().then(response => {
         result(response);
       });
@@ -71,7 +77,7 @@ export class BluetoothPage implements OnInit, OnDestroy {
    * When closing the application, it ensures that the bluetooth connection is closed.
    */
   ngOnDestroy() {
-    this.isConnected = false;
+    //this.stopReceiveData();
     this.disconnect();
   }
   /**
@@ -127,15 +133,17 @@ export class BluetoothPage implements OnInit, OnDestroy {
             handler: () => {
               this.disconnect().then(() => {
                 this.bluetooth.deviceConnection(seleccion.id, seleccion.name).then(success => {
-                  this.sendMessage('Reconnection established by checkConnection()');
+                  this.addDebugLine('Reconnection established by checkConnection()');
                   this.isConnected = true;
                   this.ConnectedId=this.bluetooth.ConnectedId;
                   this.ConnectedName=this.bluetooth.ConnectedName;
+                  this.startReceiveData();
                   this.presentToast(this.translate.instant(success));
                 }, fail => {
                   this.isConnected = false;
                   this.ConnectedId='';
                   this.ConnectedName='';
+                  //this.stopReceiveData();
                   this.presentToast(this.translate.instant(fail));
                 });
               });
@@ -158,15 +166,17 @@ export class BluetoothPage implements OnInit, OnDestroy {
             text: this.translate.instant('ACCEPT'),
             handler: () => {
               this.bluetooth.deviceConnection(seleccion.id, seleccion.name).then(success => {
-                this.sendMessage('Connection established by checkConnection()');
+                this.addDebugLine('Connection established by checkConnection()');
                 this.isConnected = true;
                 this.ConnectedId=this.bluetooth.ConnectedId;
                 this.ConnectedName=this.bluetooth.ConnectedName;
+                this.startReceiveData();
                 this.presentToast(this.translate.instant(success));
               }, fail => {
                 this.isConnected = false;
                 this.ConnectedId='';
                 this.ConnectedName='';
+                //this.stopReceiveData();
                 this.presentToast(this.translate.instant(fail));
               });
             }
@@ -179,14 +189,15 @@ export class BluetoothPage implements OnInit, OnDestroy {
   /**
    * Send text messages via serial when connecting via bluetooth.
    */
-  sendMessage(message: string) {
+  /**
+    sendMessage(message: string) {
     this.bluetooth.dataInOut(`${message}\n`).subscribe(data => {  //.subscribe(next, error, complete). Subscrive only next: "data => {"
       if (data !== 'BLUETOOTH.NOT_CONNECTED') {
         try {                                                   // block of code to be tested for errors while it is being executed
           if (data) {
             // const entry = JSON.parse(data);                     //Converts a JavaScript Object Notation (JSON) string into an object. data shall be a valid JSON string
             this.RecievedMsg = JSON.parse(data);                     //Converts a JavaScript Object Notation (JSON) string into an object. data shall be a valid JSON string
-            this.addLine(message);
+            this.addSentLine(message);
           }
         } catch (error) {                                       // block of code to be executed, if an error occurs in the try block
           console.log(`[bluetooth-168]: ${JSON.stringify(error)}`);
@@ -198,12 +209,14 @@ export class BluetoothPage implements OnInit, OnDestroy {
       }
     });
   }
+  */
+
     /**
    * Send text messages via serial when connecting via bluetooth.
    */
   sendData(datatosend: string) {
     this.bluetooth.dataSend(`${datatosend}\n`).then(success => {
-      this.presentToast('sent '+ datatosend);
+      this.addSentLine(`${datatosend}\n`);
     }, fail => {
       this.isConnected = false;
       this.ConnectedId='';
@@ -211,12 +224,59 @@ export class BluetoothPage implements OnInit, OnDestroy {
       this.presentToast(this.translate.instant(fail));
     });
   }
+
+    /**
+   * Set up the subscribe to received data and handle the incoming messages.
+   */
+   startReceiveData() {
+//    this.RxSubscription = this.bluetooth.receiverObservable.subscribe( data => {
+    this.addDebugLine('startReceiveData before subscibe RxObservable');
+    
+    this.bluetooth.RxObservable().subscribe( data => {
+      this.addDebugLine('Received data inside RxObservable function');
+      this.addReceivedLine(JSON.parse(data));                     //Converts a JavaScript Object Notation (JSON) string into an object. data shall be a valid JSON stringdata);
+    });
+    this.addDebugLine('startReceiveData after subscibe RxObservable');
+  }
+  
   /**
-   * Retrieve the basic server information for line graphs.
+   * Remove the subscribe to received data.
+   */
+/**  stopReceiveData() {
+    this.RxSubscription.unsubscribe();
+    this.addDebugLine('startReceiveData UNsubscibed receiverObservable');
+  } */
+  /**
+   * Add a line on the list of sent messages.
    * @param message
    */
-  addLine(message) {
-    this.messages.push(message);
+  addSentLine(sentmessage) {
+    this.sentmessages.push(sentmessage);
+  }
+    /**
+   * Add a line on the list of debug messages.
+   * @param message
+   */
+  addDebugLine(debugmessage) {
+    this.debugmessages.push(debugmessage);
+  }
+  
+      /**
+   * Add a line on the list of received messages.
+   * @param message
+   */
+  addReceivedLine(receivedmessage) {
+    this.receivedmessages.push(receivedmessage);
+  }
+
+  clearDebugList() {
+    this.debugmessages = [];
+  }
+  clearSentList() {
+    this.sentmessages = [];
+  }
+  clearRecievedList() {
+    this.receivedmessages = [];
   }
   /**
    * Present a message box.

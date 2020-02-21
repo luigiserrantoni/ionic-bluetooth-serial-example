@@ -15,8 +15,11 @@ export class BluetoothService {
   private connection: Subscription;
   private connectionCommunication: Subscription;
   private reader: Observable<any>;
+  //receiverObservable: Observable<any>;
   ConnectedId = '';       //id of connected device, empty if not conencted
   ConnectedName = '';       //Name of connected device, empty if not conencted
+  private RxSubscription: Subscription;
+  private decoder = new TextDecoder('utf-8');
 
   constructor(
     private bluetoothSerial: BluetoothSerial,
@@ -73,11 +76,13 @@ export class BluetoothService {
         this.storage.setBluetoothName(name);
         this.ConnectedId=id;
         this.ConnectedName=name;
+        //this.startReceiverObservable();
         resolve('BLUETOOTH.CONNECTED');
       }, fail => {                                                              //Error callback function, invoked when error occurs or the connection disconnects.
         console.log(`[bluetooth.service-88] Connection error: ${JSON.stringify(fail)}`);
-        this.ConnectedId='';
+        this.ConnectedId='';                                                    //if a reconecction is in progress the variables are set, need to be cleared        
         this.ConnectedName='';
+        //this.stopReceiverObservable();
         reject('BLUETOOTH.CANNOT_CONNECT');
       });
     });
@@ -96,6 +101,7 @@ export class BluetoothService {
       }
       this.ConnectedId='';
       this.ConnectedName='';
+     // this.stopReceiverObservable();
       result(true);
     });
   }
@@ -126,6 +132,35 @@ export class BluetoothService {
   }
 
 
+RxObservable(): Observable<any> {
+  return Observable.create(observer => {
+    this.bluetoothSerial.subscribeRawData().subscribe(
+    data => observer.next(this.decoder.decode(data)));          // the success callback is called whenever data is received
+    });
+      //    return this.bluetoothSerial.subscribeRawData();
+};
+
+ /**
+   * Start the socket for serial communications after connecting with a bluetooth device
+   * @param 
+   * @returns {Observable<any>} Return the text that arrives via serial connection
+   * bluetooth to the device, if there is no connection, a message returns indicating that:
+   * _You are not connected to any bluetooth device_.
+   */
+   //  startReceiverObservable() {
+  //  this.RxSubscription = this.receiverObservable.subscribe(data => {
+   //   return this.bluetoothSerial.subscribeRawData();                                                          //send to subscriber(s) the data
+   // });
+  //}
+  
+ /**
+   * Stop the socket for serial communications after disconnecting a bluetooth device
+   * @param 
+   * @returns 
+   */
+ // stopReceiverObservable() {
+ //   this.RxSubscription.unsubscribe();
+ // }
 
     /**
    * Send data to bluetooth device
@@ -136,11 +171,18 @@ export class BluetoothService {
    */
   dataSend(message: string): Promise<string> {
     return new Promise((resolve, reject) => {
-          this.bluetoothSerial.isConnected().then((isConnected) => {                        //if connected execute callback (isConnected) => {...
-            this.bluetoothSerial.write(message);
-            resolve('BLUETOOTH.CONNECTED');
+      this.bluetoothSerial.isConnected().then((isConnected) => {                        //if connected execute callback (isConnected) => {...
+        this.bluetoothSerial.write(message).then(success => {
+          resolve('SEND_OK');
+        }, error => {                                                           //comunication error. Bielive given only by disconnection
+          this.ConnectedId='';                                                  //so managed in tha same way
+          this.ConnectedName='';
+          reject('BLUETOOTH.CANNOT_CONNECT');
+        });
       }, fail => {                                                               //if not execute callback notConected => { ....
-        reject('BLUETOOTH.CANNOT_CONNECT');
+        this.ConnectedId='';
+        this.ConnectedName='';
+        reject('BLUETOOTH.NOT_CONNECTED');
       });
     });
   }

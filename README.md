@@ -4,13 +4,18 @@
 - Added Italian language
 - Translated comments in english
 - Removed @angular/http module (already use @angular/common/http)
-- Modified form submit action to sendMessage(message) in bluetooth.page.html
+- Modified the form action used to submit the meggage to sendMessage(message) (file bluetooth.page.html)
 - Layot change in bluetooth.page.html: separated the items in different sections and included in cards
-- replaced the refresh method for device scan with a button
-
+- Replaced the refresh method for device scan with a button
+- Receive data implemented. Received data is sent to page using an observable.
+- Inserted a Debug screen
 
 To be done...
-send/receive functinality
+Screen refresh to show received data (acctually shown only on update, not shown after delete of list)
+Package the data into the observable in sting+/n
+Test on receive data for different data types
+Test on device disconnection
+
 
 To install cordova
 ```bash

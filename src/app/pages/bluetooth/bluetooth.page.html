@@ -14,7 +14,7 @@
   </ion-refresher>    -->
 
   <ion-card>
-    <ion-card-header><ion-card-title>{{ "STATUS_TITLE" | translate }}</ion-card-title></ion-card-header>
+    <ion-card-header color="light"><ion-card-title>{{ "STATUS_TITLE" | translate }}</ion-card-title></ion-card-header>
     <ion-card-content>
       <span [hidden]="!isConnected"><p> {{ "CONNECTED_TO_STATUS" | translate }} {{ConnectedName}}</p></span>
       <span [hidden]="isConnected"><p>{{ "DISCONNECTED_STATUS" | translate }}</p></span>
@@ -29,7 +29,7 @@
   <!-- Availabel devices -->
   <!-- <span [hidden]="isConnected">   -->
   <ion-card>
-    <ion-card-header><ion-card-title>{{ "AVAILABLE_DEVICES_TITLE" | translate }}</ion-card-title></ion-card-header>
+    <ion-card-header color="light"><ion-card-title>{{ "AVAILABLE_DEVICES_TITLE" | translate }}</ion-card-title></ion-card-header>
     <ion-card-content>
       <!--<h3>{{ "AVAILABLE_DEVICES" | translate }}</h3> -->
       <div [hidden]="showSpinner === false" class="ion-text-center">
@@ -84,9 +84,9 @@
     </ion-card-content>
   </ion-card>
   -->
-  
+
   <ion-card>
-    <ion-card-header><ion-card-title>{{ "SEND_MSG_TITLE" | translate }}</ion-card-title></ion-card-header>
+    <ion-card-header color="light"><ion-card-title>{{ "SEND_MSG_TITLE" | translate }}</ion-card-title></ion-card-header>
     <ion-card-content>
       <form (ngSubmit)="sendData(datatosend);">
         <ion-item>
@@ -101,9 +101,9 @@
   </ion-card>
 
   <ion-card>
-    <ion-card-header><ion-card-title>{{ "MSG_LIST_TITLE" | translate }}</ion-card-title></ion-card-header>
+    <ion-card-header color="light"><ion-card-title>{{ "MSG_LIST_TITLE" | translate }}</ion-card-title></ion-card-header>
     <ion-card-content>
-      <h3>Sent messages list</h3>
+      <p><b>Sent messages list</b></p>
       <p *ngFor="let item of sentmessages">{{ item }}</p>
       <ion-button expand="block" (click)="clearSentList()">
         <ion-icon slot="start" name="trash"></ion-icon>DELETE LIST
@@ -112,9 +112,9 @@
   </ion-card>
 
   <ion-card>
-    <ion-card-header><ion-card-title>Received messages</ion-card-title></ion-card-header>
+    <ion-card-header color="light"><ion-card-title>Received messages</ion-card-title></ion-card-header>
     <ion-card-content>
-      <h3>Received messages list</h3>
+      <p><b>Received messages list</b></p>
       <p *ngFor="let item of receivedmessages">{{ item }}</p>
       <ion-button expand="block" (click)="clearRecievedList()">
         <ion-icon slot="start" name="trash"></ion-icon>DELETE LIST
@@ -123,7 +123,7 @@
   </ion-card>
 
   <ion-card>
-    <ion-card-header><ion-card-title>DEBUG</ion-card-title></ion-card-header>
+    <ion-card-header color="light"><ion-card-title>Debug</ion-card-title></ion-card-header>
     <ion-card-content>
       <p><b>Debug messages list</b></p>
       <p *ngFor="let item of debugmessages">{{ item }}</p>

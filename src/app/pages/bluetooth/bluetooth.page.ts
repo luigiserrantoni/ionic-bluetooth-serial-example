@@ -231,14 +231,17 @@ export class BluetoothPage implements OnInit, OnDestroy {
    startReceiveData() {
 //    this.RxSubscription = this.bluetooth.receiverObservable.subscribe( data => {
     this.addDebugLine('startReceiveData before subscibe RxObservable');
-    
+   // const chunks = [];
     this.bluetooth.RxObservable().subscribe( data => {
       this.addDebugLine('Received data inside RxObservable function');
-      this.addReceivedLine(JSON.parse(data));                     //Converts a JavaScript Object Notation (JSON) string into an object. data shall be a valid JSON stringdata);
+
+      //chunks.push(data);
+      this.presentToast(data);
+      //"this.addReceivedLine(JSON.parse(data));                     //Converts a JavaScript Object Notation (JSON) string into an object. data shall be a valid JSON stringdata);
     });
     this.addDebugLine('startReceiveData after subscibe RxObservable');
   }
-  
+
   /**
    * Remove the subscribe to received data.
    */
@@ -250,33 +253,34 @@ export class BluetoothPage implements OnInit, OnDestroy {
    * Add a line on the list of sent messages.
    * @param message
    */
-  addSentLine(sentmessage) {
+  addSentLine(sentmessage: string) {
     this.sentmessages.push(sentmessage);
   }
     /**
    * Add a line on the list of debug messages.
    * @param message
    */
-  addDebugLine(debugmessage) {
+  addDebugLine(debugmessage: string) {
     this.debugmessages.push(debugmessage);
   }
-  
+
       /**
    * Add a line on the list of received messages.
    * @param message
    */
-  addReceivedLine(receivedmessage) {
+  addReceivedLine(receivedmessage: string) {
     this.receivedmessages.push(receivedmessage);
   }
 
-  clearDebugList() {
-    this.debugmessages = [];
-  }
+
   clearSentList() {
     this.sentmessages = [];
   }
   clearRecievedList() {
     this.receivedmessages = [];
+  }
+  clearDebugList() {
+    this.debugmessages = [];
   }
   /**
    * Present a message box.
